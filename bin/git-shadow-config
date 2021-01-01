@@ -1,0 +1,43 @@
+l_copy_to_local() {
+local from="default"
+if [ -n "$1" ]; then from=$1; fi
+IFS='='
+git config -f "${HOME:-$USERPROFILE}/.gitconfig.shadow.d/$from" --list | while read -r -a c ; do
+  git config --local "${c[0]}" "${c[1]}"
+done
+}
+
+l_show() {
+local from="default"
+if [ -n "$1" ]; then from=$1; fi
+IFS='='
+git config -f "${HOME:-$USERPROFILE}/.gitconfig.shadow.d/$from" --list | while read -r -a c ; do
+  echo git config --local "${c[0]}" "${c[1]}"
+done
+}
+
+l_list() {
+ls --color=never "${HOME:-$USERPROFILE}/.gitconfig.shadow.d/"
+}
+
+l_usage() {
+echo "usage:" "$1" "<command>"
+echo "commands:"
+echo "  list"
+echo "  show [name]"
+echo "  copy-to-local [name]"
+}
+
+
+case "$1" in
+  list)
+    l_list ;;
+  show)
+    shift
+    l_show "$@";;
+  copy-to-local)
+    shift
+    l_copy_to_local "$@";;
+  *)
+    l_usage $(basename "$0") ;;
+esac
